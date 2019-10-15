@@ -3,3 +3,4 @@ blog_project/.idea/*
 *.xml
 *.pyc
 *.xlsx
+*.sqlite3
