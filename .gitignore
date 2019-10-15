@@ -1,0 +1,5 @@
+blog_project/.idea/*
+.idea/*
+*.xml
+*.pyc
+*.xlsx
