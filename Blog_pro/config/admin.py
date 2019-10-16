@@ -4,6 +4,9 @@ from .models import Link, SideBar
 
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
+    """
+    分享链接后台
+    """
     list_display = (
         'title', 'href', 'status', 'weight', 'create_time'
     )
@@ -16,6 +19,9 @@ class LinkAdmin(admin.ModelAdmin):
 
 @admin.register(SideBar)
 class SideBarAdmin(admin.ModelAdmin):
+    """
+    侧边栏后台
+    """
     list_display = (
         'title', 'display_type', 'content', 'create_time'
     )

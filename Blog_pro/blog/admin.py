@@ -7,6 +7,9 @@ from Blog_pro.custom_site import custom_site
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    """
+    分类后台
+    """
     list_display = ('name', 'status', 'is_nav', 'create_time', 'author')
     fields = ('name', 'status', 'is_nav')
 
@@ -17,9 +20,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    """
+    标签后台
+    """
     list_display = ('name', 'status', 'create_time')
     fields = ('name', 'status')
 
+    # 重写save_model方法，返回当前登录的用户的user对象
     def save_model(self, request, obj, form, change):
         obj.author = request.user
         return super(TagAdmin, self).save_model(request, obj, form, change)
@@ -45,6 +52,9 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
 
 @admin.register(Article, site=custom_site)
 class ArticleAdmin(admin.ModelAdmin):
+    """
+    文章后台
+    """
     list_display = [
         'title', 'category', 'status', 'create_time', 'author', 'operator'
     ]
@@ -67,6 +77,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'tag'
     )
 
+    # 同页面编辑需求实现
     def operator(self, obj):
         return format_html(
             '<a href="{}">编辑</a>',
@@ -78,11 +89,15 @@ class ArticleAdmin(admin.ModelAdmin):
         obj.author = request.user
         return super(ArticleAdmin, self).save_model(request, obj, form, change)
 
+    # 重写get_queryset方法，返回当前登录用户
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
         return qs.filter(author=request.user)
 
     class Media:
+        """
+        引用bootstrap样式
+        """
         css = {
             'all': ("https://cdn.bootcss.com/bootstrap/4.0.0-beta/css/bootstrap.min.css",),
         }
