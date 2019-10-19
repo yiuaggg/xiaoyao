@@ -16,9 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .custom_site import custom_site
+from utils.custom_site import custom_site
+from blog.views import article_list, article_detail
+from config.views import links
 
 urlpatterns = [
+    path('', article_list),
+    path('category/<int:category_id>', article_list),
+    path('tag/<int:tag_id>', article_list),
+    path('article/<int:article_id>', article_detail),
+    path('links/', links),
     path('super_admin/', admin.site.urls),
     path('admin/', custom_site.urls),
 ]

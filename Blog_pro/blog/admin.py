@@ -1,35 +1,46 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from django.contrib.admin.models import LogEntry
+
 from .models import Category, Tag, Article
-from Blog_pro.custom_site import custom_site
+from .adminforms import ArticleAdminForm
+
+from utils.custom_site import custom_site
+from utils.base_admin import BaseOwnerAdmin
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class ArticleInline(admin.StackedInline):
+    """
+    展示样式
+    """
+    fields = ('title', 'desc')
+    extra = 1
+    model = Article
+
+
+@admin.register(Category, site=custom_site)
+class CategoryAdmin(BaseOwnerAdmin):
     """
     分类后台
     """
+    inlines = [ArticleInline]
     list_display = ('name', 'status', 'is_nav', 'create_time', 'author')
     fields = ('name', 'status', 'is_nav')
 
-    def save_model(self, request, obj, form, change):
-        obj.author = request.user
-        return super(CategoryAdmin, self).save_model(request, obj, form, change)
+    def article_count(self, obj):
+        return obj.post_set.count()
+
+    article_count.short_description = '文章数量'
 
 
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
+@admin.register(Tag, site=custom_site)
+class TagAdmin(BaseOwnerAdmin):
     """
     标签后台
     """
     list_display = ('name', 'status', 'create_time')
     fields = ('name', 'status')
-
-    # 重写save_model方法，返回当前登录的用户的user对象
-    def save_model(self, request, obj, form, change):
-        obj.author = request.user
-        return super(TagAdmin, self).save_model(request, obj, form, change)
 
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
@@ -51,7 +62,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
 
 
 @admin.register(Article, site=custom_site)
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(BaseOwnerAdmin):
     """
     文章后台
     """
@@ -63,19 +74,28 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = [CategoryOwnerFilter]
     search_fields = ['title', 'category__name']
 
-    # actions_on_top = True
-    # actions_on_bottom = True
-
     # 编辑页面
-    # save_on_top = True
-
-    fields = (
-        ('category', 'title'),
-        'desc',
-        'status',
-        'content',
-        'tag'
+    exclude = ['author']
+    fieldsets = (
+        ('基础配置', {
+            'description': '基础配置描述',
+            'fields': (
+                ('title', 'category'),
+                'status'
+            ),
+        }),
+        ('内容', {
+            'fields': (
+                'desc',
+                'content',
+            ),
+        }),
+        ('额外信息', {
+            'classes': ('wide',),
+            'fields': ('tag',),
+        })
     )
+    filter_vertical = ('tag',)
 
     # 同页面编辑需求实现
     def operator(self, obj):
@@ -85,15 +105,6 @@ class ArticleAdmin(admin.ModelAdmin):
         )
     operator.short_description = '操作'
 
-    def save_model(self, request, obj, form, change):
-        obj.author = request.user
-        return super(ArticleAdmin, self).save_model(request, obj, form, change)
-
-    # 重写get_queryset方法，返回当前登录用户
-    def get_queryset(self, request):
-        qs = super(ArticleAdmin, self).get_queryset(request)
-        return qs.filter(author=request.user)
-
     class Media:
         """
         引用bootstrap样式
@@ -102,3 +113,10 @@ class ArticleAdmin(admin.ModelAdmin):
             'all': ("https://cdn.bootcss.com/bootstrap/4.0.0-beta/css/bootstrap.min.css",),
         }
         js = ("https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js",)
+
+
+@admin.register(LogEntry, site=custom_site)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = [
+        'object_repr', 'object_id', 'action_flag', 'user', 'change_message'
+    ]

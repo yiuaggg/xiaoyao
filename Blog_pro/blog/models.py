@@ -62,7 +62,7 @@ class Article(models.Model):
     title = models.CharField(max_length=128, verbose_name='标题')
     desc = models.CharField(max_length=1204, verbose_name='摘要')
     content = models.TextField(verbose_name='正文')
-    tag = models.ForeignKey(Tag, verbose_name='标签', on_delete=models.CASCADE)
+    tag = models.ManyToManyField(Tag, verbose_name='标签')
     category = models.ForeignKey(Category, verbose_name='分类', on_delete=models.CASCADE)
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEM, verbose_name='状态')
     author = models.ForeignKey(User, verbose_name='作者', on_delete=models.CASCADE)
