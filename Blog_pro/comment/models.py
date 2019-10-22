@@ -18,6 +18,10 @@ class Comment(models.Model):
     target = models.ForeignKey(Article, verbose_name='评论目标', on_delete=models.CASCADE)
     content = models.CharField(max_length=1024, verbose_name='评论内容')
     commenter = models.ForeignKey(User, verbose_name='评论者', on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=50, default='', verbose_name='昵称')
 
     class Meta:
         verbose_name = verbose_name_plural = '评论'
+
+    def __str__(self):
+        return self.target_id

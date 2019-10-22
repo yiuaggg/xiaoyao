@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if article %}
+<h1>{{ article.title }}</h1>
+<div>
+    <span>分类:{{ article.category.name }}</span>
+    <span>作者:{{ article.author.name }}</span>
+</div>
+<hr/>
+<p>
+    {{ article.content }}
+</p>
+{% endif %}
+</body>
+</html>
